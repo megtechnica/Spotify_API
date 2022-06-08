@@ -4,17 +4,16 @@ import numpy as np
 import pandas as pd
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
-import credentials
 
+credentials = open("credentials.json")
 
-import matplotlib.pyplot as plt
+credentials = json.load(credentials)
 
-SPOTIPY_CLIENT_ID = credentials.client_id
-SPOTIPY_CLIENT_SECRET = credentials.client_secret
-
-client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID,
-                                                      client_secret=SPOTIPY_CLIENT_SECRET)
+client_credentials_manager = SpotifyClientCredentials(client_id=credentials['ClientID'],
+                                                      client_secret=credentials['ClientSecret'])
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+
+name = 'Cannibal Corpse'
 
 def get_artist_uri(name):
     results = sp.search(q='artist:' + name, type='artist')
@@ -22,12 +21,9 @@ def get_artist_uri(name):
     artist_uri = items[0]['uri']
     return artist_uri
 
-artist_uri = get_artist_uri(name)
-
-results = sp.search(q=artist, limit=50, type='track')
-for i, t in enumerate(results['tracks']['items']):
-    print(' ', i, t['name'])
-
+# results = sp.search(q=artist, limit=50, type='track')
+# for i, t in enumerate(results['tracks']['items']):
+#     print(' ', i, t['name'])
 
 def get_artist_albums(artist_uri):
     albums = {}
@@ -35,3 +31,6 @@ def get_artist_albums(artist_uri):
     for i, item in enumerate(results['items']):
         albums[item['name'].title()] = item['uri']
     return albums
+
+artist_uri = get_artist_uri(name)
+artist_albums = get_artist_albums(artist_uri)
