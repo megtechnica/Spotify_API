@@ -23,4 +23,15 @@ def get_artist_uri(name):
     return artist_uri
 
 artist_uri = get_artist_uri(name)
-pprint(artist_uri)
+
+results = sp.search(q=artist, limit=50, type='track')
+for i, t in enumerate(results['tracks']['items']):
+    print(' ', i, t['name'])
+
+
+def get_artist_albums(artist_uri):
+    albums = {}
+    results = sp.artist_albums(artist_uri, album_type='album', limit=25)
+    for i, item in enumerate(results['items']):
+        albums[item['name'].title()] = item['uri']
+    return albums
