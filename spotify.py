@@ -42,6 +42,7 @@ def get_audio_features_dict(full_tracklist, sp):
         audio_features_dict[uri] = {'energy': features[0]['energy'],
                                     'valence': features[0]['valence'],
                                     'danceability': features[0]['danceability'],
+                                    'tempo': features[0]['tempo']
                                    }
     return audio_features_dict
 
@@ -49,5 +50,6 @@ def merge_song_data(song_data, audio_features_dict, sp):
     song_data['energy'] = song_data['uri'].apply(lambda x: audio_features_dict[x]['energy'])
     song_data['valence'] = song_data['uri'].apply(lambda x: audio_features_dict[x]['valence'])
     song_data['danceability'] = song_data['uri'].apply(lambda x: audio_features_dict[x]['danceability'])
+    song_data['tempo'] = song_data['uri'].apply(lambda x: audio_features_dict[x]['tempo'])
     song_data.drop('features', axis=1, inplace=True)
     return song_data
