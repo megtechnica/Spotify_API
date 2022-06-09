@@ -13,7 +13,7 @@ client_credentials_manager = SpotifyClientCredentials(client_id=credentials['Cli
                                                       client_secret=credentials['ClientSecret'])
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
-name = 'Cannibal Corpse'
+name = 'Sepultura'
 
 def get_artist_uri(name):
     results = sp.search(q='artist:' + name, type='artist')
@@ -28,9 +28,35 @@ def get_artist_uri(name):
 def get_artist_albums(artist_uri):
     albums = {}
     results = sp.artist_albums(artist_uri, album_type='album', limit=25)
+
     for i, item in enumerate(results['items']):
-        albums[item['name'].title()] = item['uri']
+        if 'US' in item['available_markets']:
+            albums[item['name'].title()] = item['uri']
+
     return albums
+
+def get_full_tracklist_dict(artist_albums_uri):
+    tracklist = {}
+    for album_uri in artist_albums_uri:
+        album = sp.album(album_uri)
+        for track in album['tracks']['items']:
+            tracklist[track['name'].title()] = track['uri']
+    return tracklist
+
+def get_clean_album_uri_list(artist_albums, albums_to_delete):
+    if albums_to_delete is not None:
+        for key in albums_to_delete:
+            artist_albums.pop(key)
+    artist_albums_uri = [uri for uri in artist_albums.values()]
+    return artist_albums_uri
+
+
 
 artist_uri = get_artist_uri(name)
 artist_albums = get_artist_albums(artist_uri)
+
+albums_to_delete =[]
+artist_albums_uri = get_clean_album_uri_list(artist_albums, albums_to_delete)
+full_tracklist = get_full_tracklist_dict(artist_albums_uri)
+print(list(full_tracklist.items()))
+print("Total tracks:", len(full_tracklist))
