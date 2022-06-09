@@ -49,4 +49,4 @@ sns.displot(song_data['danceability'],hist_kws={'edgecolor': 'grey'},
 axes[0].set_xlabel('Valence', fontsize='large')
 axes[1].set_xlabel('Energy', fontsize='large')
 axes[2].set_xlabel('Danceability', fontsize='large')
-axes[0].set_ylabel('Frequency', fontsize='large');
+axes[0].set_ylabel('Frequency', fontsize='large')
