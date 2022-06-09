@@ -29,15 +29,16 @@ for name in band_names:
 
     audio_features_dict = get_audio_features_dict(full_tracklist, sp)
 
-    temp_df1 = pd.DataFrame(full_tracklist.items(), columns = ['title', 'uri'])
-    temp_df2 = pd.DataFrame(audio_features_dict.items(), columns = ['uri', 'features'])
-    assert len(temp_df1) == len(temp_df2)
-    song_data = pd.merge(temp_df1, temp_df2, on=['uri'])
+    df1 = pd.DataFrame(full_tracklist.items(), columns=['title', 'uri'])
+    df2 = pd.DataFrame(audio_features_dict.items(), columns=['uri', 'features'])
+    assert len(df1) == len(df2)
+    song_data = pd.merge(df1, df2, on=['uri'])
 
     song_data = merge_song_data(song_data, audio_features_dict, sp)
 
-    song_data.to_csv('data/' + name + ' - Song Data.csv')
+    song_data_statistics = song_data.describe()
 
+    song_data_statistics.to_csv('data/' + name + ' - Summary Statistics.csv')
 
     fig, axes = plt.subplots(nrows=1, ncols=3, sharex=True, figsize=(16,4))
 
