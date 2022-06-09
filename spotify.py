@@ -34,3 +34,13 @@ def get_full_tracklist(artist_albums_uri, sp):
         for track in album['tracks']['items']:
             tracklist[track['name'].title()] = track['uri']
     return tracklist
+
+def get_audio_features_dict(full_tracklist, sp):
+    audio_features_dict = {}
+    for uri in list(full_tracklist.values()):
+        features = sp.audio_features(uri)
+        audio_features_dict[uri] = {'energy': features[0]['energy'],
+                                    'valence': features[0]['valence'],
+                                    'danceability': features[0]['danceability'],
+                                   }
+    return audio_features_dict
