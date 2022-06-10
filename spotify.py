@@ -16,17 +16,6 @@ def get_artist_albums(artist_uri, sp):
 
     return albums
 
-def remove_live_and_remastered_albums(artist_albums, sp):
-    key_words = ['Live', 'Edition', 'Sessions']
-    all_album_names = list(artist_albums.keys())
-    for album in all_album_names:
-        for key in key_words:
-            if key in album:
-                artist_albums.pop(album)
-
-    artist_albums_uri = [uri for uri in artist_albums.values()]
-    return artist_albums_uri
-
 def get_full_tracklist(artist_albums_uri, sp):
     tracklist = {}
     for album_uri in artist_albums_uri:
@@ -42,5 +31,16 @@ def get_audio_features_dict(full_tracklist, sp):
         audio_features_dict[uri] = {'energy': features[0]['energy'],
                                     'valence': features[0]['valence'],
                                     'danceability': features[0]['danceability'],
-                                   }
+                                    'tempo': features[0]['tempo'],
+                                    'liveness': features[0]['liveness']
+                                    }
     return audio_features_dict
+
+def merge_song_data(song_data: dict, audio_features_dict: dict, sp) -> dict:
+
+    song_data['energy'] = song_data['uri'].apply(lambda x: audio_features_dict[x]['energy'])
+    song_data['valence'] = song_data['uri'].apply(lambda x: audio_features_dict[x]['valence'])
+    song_data['danceability'] = song_data['uri'].apply(lambda x: audio_features_dict[x]['danceability'])
+    song_data['tempo'] = song_data['uri'].apply(lambda x: audio_features_dict[x]['tempo'])
+    song_data.drop('features', axis=1, inplace=True)
+    return song_data
