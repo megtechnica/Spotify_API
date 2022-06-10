@@ -1,10 +1,10 @@
-from pprint import pprint
+
 import json
-import numpy as np
+
 import pandas as pd
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
-from spotify import get_artist_uri, get_artist_albums, remove_live_and_remastered_albums, get_full_tracklist, get_audio_features_dict
+from spotify import get_artist_uri, get_artist_albums, get_full_tracklist, get_audio_features_dict, merge_song_data
 
 import matplotlib.pyplot as plt
 
@@ -18,35 +18,39 @@ client_credentials_manager = SpotifyClientCredentials(client_id=credentials['Cli
                                                       client_secret=credentials['ClientSecret'])
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
-name = 'Bolt Thrower'
+band_names = ['Blood Incantation']
+
+for name in band_names:
+    artist_uri = get_artist_uri(name, sp)
+    artist_albums_uri = get_artist_albums(artist_uri, sp)
+    full_tracklist = get_full_tracklist(artist_albums_uri, sp)
+    audio_features = get_audio_features_dict(full_tracklist, sp)
+
+    df1 = pd.DataFrame(full_tracklist.items(), columns=['title', 'uri'])
+    df2 = pd.DataFrame(audio_features.items(), columns=['uri', 'features'])
+    assert len(df1) == len(df2)
+    song_data = pd.merge(df1, df2, on=['uri'])
+
+    song_data = merge_song_data(song_data, audio_features, sp)
+    song_data.to_csv('data/' + name + ' - Song Data.csv')
+    song_data_statistics = song_data.describe()
+
+    song_data_statistics.to_csv('data/' + name + ' - Summary Statistics.csv')
 
 
-artist_uri = get_artist_uri(name, sp)
-artist_albums = get_artist_albums(artist_uri, sp)
-artist_albums_uri = remove_live_and_remastered_albums(artist_albums, sp)
-full_tracklist = get_full_tracklist(artist_albums_uri, sp)
-audio_features = get_audio_features_dict(full_tracklist, sp)
-
-audio_features_dict = get_audio_features_dict(full_tracklist, sp)
-
-temp_df1 = pd.DataFrame(full_tracklist.items(), columns = ['title', 'uri'])
-temp_df2 = pd.DataFrame(audio_features_dict.items(), columns = ['uri', 'features'])
-assert len(temp_df1) == len(temp_df2)
-song_data = pd.merge(temp_df1, temp_df2, on=['uri'])
-
-song_data['energy'] = song_data['uri'].apply(lambda x: audio_features_dict[x]['energy'])
-song_data['valence'] = song_data['uri'].apply(lambda x: audio_features_dict[x]['valence'])
-song_data['danceability'] = song_data['uri'].apply(lambda x: audio_features_dict[x]['danceability'])
-song_data.drop('features', axis=1, inplace=True)
+    sns.displot(song_data['valence'])
+    plt.savefig('figures/' + name + ' - Valence Figure')
+    plt.clf()
 
 
-fig, axes = plt.subplots(nrows=1, ncols=3, sharex=True, figsize=(16,4))
-sns.displot(song_data['valence'], hist_kws={'edgecolor': 'grey'},ax=axes[0])
-sns.displot(song_data['energy'], hist_kws={'edgecolor': 'grey'}, ax=axes[1])
-sns.displot(song_data['danceability'],hist_kws={'edgecolor': 'grey'},
-             color="grey", ax=axes[2])
+    sns.displot(song_data['energy'])
+    plt.savefig('figures/' + name + ' - Energy Figure')
+    plt.clf()
 
-axes[0].set_xlabel('Valence', fontsize='large')
-axes[1].set_xlabel('Energy', fontsize='large')
-axes[2].set_xlabel('Danceability', fontsize='large')
-axes[0].set_ylabel('Frequency', fontsize='large')
+    sns.displot(song_data['danceability'])
+    plt.savefig('figures/' + name + ' - Danceability Figure')
+    plt.clf()
+
+    sns.displot(song_data['tempo'])
+    plt.savefig('figures/' + name + ' - Tempo Figure')
+    plt.clf()
