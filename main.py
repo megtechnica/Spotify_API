@@ -1,6 +1,6 @@
-from pprint import pprint
+
 import json
-import numpy as np
+
 import pandas as pd
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -18,7 +18,7 @@ client_credentials_manager = SpotifyClientCredentials(client_id=credentials['Cli
                                                       client_secret=credentials['ClientSecret'])
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
-band_names = ['Metallica', 'Megadeth']
+band_names = ['Blood Incantation']
 
 for name in band_names:
     artist_uri = get_artist_uri(name, sp)
@@ -35,12 +35,11 @@ for name in band_names:
     song_data = pd.merge(df1, df2, on=['uri'])
 
     song_data = merge_song_data(song_data, audio_features_dict, sp)
-
+    song_data.to_csv('data/' + name + ' - Song Data.csv')
     song_data_statistics = song_data.describe()
 
     song_data_statistics.to_csv('data/' + name + ' - Summary Statistics.csv')
 
-    fig, axes = plt.subplots(nrows=1, ncols=3, sharex=True, figsize=(16,4))
 
     sns.displot(song_data['valence'])
     plt.savefig('figures/' + name + ' - Valence Figure')
