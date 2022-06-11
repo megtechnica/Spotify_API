@@ -16,6 +16,10 @@ def get_artist_albums(artist_uri, sp):
 
     return albums
 
+def get_clean_album_uri_list(artist_albums):
+    artist_albums_uri = [uri for uri in artist_albums.values()]
+    return artist_albums_uri
+
 def get_full_tracklist(artist_albums_uri, sp):
     tracklist = {}
     for album_uri in artist_albums_uri:
@@ -36,11 +40,16 @@ def get_audio_features_dict(full_tracklist, sp):
                                     }
     return audio_features_dict
 
-def merge_song_data(song_data: dict, audio_features_dict: dict, sp) -> dict:
+def merge_song_data(song_data: dict, audio_features_dict: dict) -> dict:
 
     song_data['energy'] = song_data['uri'].apply(lambda x: audio_features_dict[x]['energy'])
     song_data['valence'] = song_data['uri'].apply(lambda x: audio_features_dict[x]['valence'])
     song_data['danceability'] = song_data['uri'].apply(lambda x: audio_features_dict[x]['danceability'])
     song_data['tempo'] = song_data['uri'].apply(lambda x: audio_features_dict[x]['tempo'])
+    song_data['liveness'] = song_data['uri'].apply(lambda x: audio_features_dict[x]['liveness'])
     song_data.drop('features', axis=1, inplace=True)
     return song_data
+
+def calculate_brutality(song_data):
+    sb = ((1 - song_data['valence']) + song_data['energy']) / 2
+    return sb
