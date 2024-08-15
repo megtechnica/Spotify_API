@@ -18,18 +18,15 @@ def get_artist_albums(artist_uri, sp):
     """{album name : {uri: <uri>, release_date: <release_date>}"""
     return albums
 
-def get_album_popularity(album_uri, sp):
-    
-
 def get_full_tracklist_uris(artist_albums, sp):
     for album in artist_albums.keys():
         tracklist = {}
         album_contents = sp.album(artist_albums[album]['uri'])
-        
         for track in album_contents['tracks']['items']:
             tracklist[track['name']] = track['uri']
+        artist_albums[album]['popularity'] = album_contents['popularity']
         artist_albums[album]['tracklist'] = tracklist
-    """{album name:{uri: <uri>, release_date: <release_date>, tracklist:{<title>: uri, ....}}"""
+    """{album name:{uri: <uri>, release_date: <release_date>, popularity: <popularity, tracklist:{<title>: uri, ....}}"""
     return artist_albums
 
 def get_audio_features_dict(album_tracklist_uris, sp):
@@ -37,9 +34,7 @@ def get_audio_features_dict(album_tracklist_uris, sp):
         for track in album_tracklist_uris[album]['tracklist'].keys():
             track_uri = album_tracklist_uris[album]['tracklist'][track]
             audio_features = sp.audio_features(track_uri)
-            pprint(audio_features
-                   )
-            break
+            
             """Wolf'S Lair Abyss (Bonus Tracks)": {'release_date': '2019-07-19',
                                       'tracklist': {'Ancient Skin': 'spotify:track:3wfohgqEFpkMFO0pZZr9Wc',
                                                     'Ancient Skin - May 1997 Recording': 'spotify:track:6dbQHF8RTc3Bye6hkAZ2S4',
