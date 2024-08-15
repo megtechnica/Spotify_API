@@ -18,56 +18,41 @@ def get_artist_albums(artist_uri, sp):
     """{album name : {uri: <uri>, release_date: <release_date>}"""
     return albums
 
+def get_album_popularity(album_uri, sp):
+    
 
 def get_full_tracklist_uris(artist_albums, sp):
     for album in artist_albums.keys():
         tracklist = {}
         album_contents = sp.album(artist_albums[album]['uri'])
+        
         for track in album_contents['tracks']['items']:
             tracklist[track['name']] = track['uri']
         artist_albums[album]['tracklist'] = tracklist
     """{album name:{uri: <uri>, release_date: <release_date>, tracklist:{<title>: uri, ....}}"""
     return artist_albums
 
-def get_audio_features_dict(tracklist, sp):
-    for track in tracklist.keys():
-        print(track)
-        audio_features = {}
-        track_contents = sp.audio_features(tracklist[track])
-        pprint(track_contents)
-    return
-
-
-# def calculate_brutality(song_data):
-#     sb = ((1 - song_data['valence']) + song_data['energy']) / 2
-#     return sb
-
-# def get_audio_features_dict(tracklist_by_album, sp):
-#     audio_features_dict = {}
-#     for album_name in tracklist_by_album.keys():
-#         track_uris = tracklist_by_album[album_name]
-#         track_audio_features = []
-#         for uri in track_uris:
-#
-#             features = sp.audio_features(uri)
-#             track_audio_features_dict[uri] = {'energy': features[0]['energy'],
-#                                     'valence': features[0]['valence'],
-#                                     'danceability': features[0]['danceability'],
-#                                     'tempo': features[0]['tempo'],
-#                                     'liveness': features[0]['liveness']
-#                                     }
-#             track_audio_features.append(track_audio_features_dict)
-#         audio_features_dict[album_name] = track_audio_features
-#
-#     """{album title : [{danceability: int}]"""
-#     return audio_features_dict
-
-def merge_song_data(song_data: dict, audio_features_dict: dict) -> dict:
-
-    song_data['energy'] = song_data['uri'].apply(lambda x: audio_features_dict[x]['energy'])
-    song_data['valence'] = song_data['uri'].apply(lambda x: audio_features_dict[x]['valence'])
-    song_data['danceability'] = song_data['uri'].apply(lambda x: audio_features_dict[x]['danceability'])
-    song_data['tempo'] = song_data['uri'].apply(lambda x: audio_features_dict[x]['tempo'])
-    song_data['liveness'] = song_data['uri'].apply(lambda x: audio_features_dict[x]['liveness'])
-    song_data.drop('features', axis=1, inplace=True)
-    return song_data
+def get_audio_features_dict(album_tracklist_uris, sp):
+    for album in album_tracklist_uris:
+        for track in album_tracklist_uris[album]['tracklist'].keys():
+            track_uri = album_tracklist_uris[album]['tracklist'][track]
+            audio_features = sp.audio_features(track_uri)
+            pprint(audio_features
+                   )
+            break
+            """Wolf'S Lair Abyss (Bonus Tracks)": {'release_date': '2019-07-19',
+                                      'tracklist': {'Ancient Skin': 'spotify:track:3wfohgqEFpkMFO0pZZr9Wc',
+                                                    'Ancient Skin - May 1997 Recording': 'spotify:track:6dbQHF8RTc3Bye6hkAZ2S4',
+                                                    'Fall of Serephs': 'spotify:track:7H401UpfvghFY3H6StYxfb',
+                                                    'I Am the Labyrinth': 'spotify:track:2kxrOSUTm4YRisCQGx3P41',
+                                                    'Necrolust - May 1997 Recording': 'spotify:track:0rW14sgzhDrZxGVO1dei1i',
+                                                    'Symbols of Bloodswords': 'spotify:track:4Ts1LnfdgAchNbGf1EaFV0',
+                                                    'The Vortex Void of Inhumanity (Intro)': 'spotify:track:0GUz0uEidryLUqOBJW1jfb'},
+                                      'uri': 'spotify:album:2Iwm3Tru1xGW6rEttU61ca'}}"""
+    # for album_name in album_tracklist_uris.keys():
+    #     for track in album_name.keys():
+    #         pprint()
+    #     audio_features = {}
+    #     track_contents = sp.audio_features(tracklist[track])
+    #     pprint(track_contents)
+    # return
