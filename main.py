@@ -2,9 +2,8 @@ import json
 import pandas as pd
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
-from spotify import get_artist_uri, get_artist_albums, get_full_tracklist, get_audio_features_dict, merge_song_data, get_clean_album_uri_list, calculate_brutality
-import matplotlib.pyplot as plt
-import seaborn as sns
+from spotify_helper import get_artist_uri, get_artist_albums, get_full_tracklist_uris, get_audio_features_dict
+import pprint
 
 credentials = open("credentials.json")
 credentials = json.load(credentials)
@@ -12,7 +11,13 @@ client_credentials_manager = SpotifyClientCredentials(client_id=credentials['Cli
                                                       client_secret=credentials['ClientSecret'])
 
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
-band_names = ['Cannibal Corpse']
+band_name = "Mayhem"
+# get the artist uri
+artist_uri = get_artist_uri(band_name, sp)
+# get the artist's albums
+albums = get_artist_albums(artist_uri, sp)
+# get track uris with album name
+album_tracklist_uris = get_full_tracklist_uris(albums, sp)
 
 for name in band_names:
     artist_uri = get_artist_uri(name, sp)
